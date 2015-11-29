@@ -1,0 +1,140 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<title>Graficos 2 Proyecto 2</title>
+	<script type="text/javascript" src="canvas.text.js"></script>
+	<script type="text/javascript" src="faces/gentilis-normal-normal.js"></script>
+	<script type="text/javascript" src="js/ndollar.js"></script>
+	<script type="text/javascript"> 
+
+		var pressed, puntos, trazos, reconocedor, canvas_context, canvasRect; // variables globales
+		function onLoadEvent()
+		{
+			document.onselectstart = function() { return false; }
+			document.onmousedown = function() { return false; }
+			puntos = new Array(); // arreglo de puntos del trazo actual
+			trazos = new Array(); // arreglo de trazos (arreglo de arreglo de puntos)
+			reconocedor = new NDollarRecognizer(0);
+
+			var canvas = document.getElementById('myCanvas');
+			canvas_context = canvas.getContext('2d'); //obtengo el context del canvas,necesario para poder dibujar en el (parte azul)
+			canvas_context.lineWidth = 3;
+			canvas_context.font = "16px Gentilis";
+			canvasRect = getCanvasRect(canvas); // area rectangular del canvas (parte celeste, donde van a ir los trazos)
+			canvas_context.fillStyle = "rgb(68,72,136)";
+			canvas_context.fillRect(0, 0, canvasRect.width, 20);
+
+			pressed = false;// si el mouse se encuentra presionado
+		}
+
+		function getCanvasRect(canvas)
+		{
+			var w = canvas.width;
+			var h = canvas.height;
+			var cx = canvas.offsetLeft;
+			var cy = canvas.offsetTop;
+			while (canvas.offsetParent != null){
+				canvas = canvas.offsetParent;
+				cx += canvas.offsetLeft;
+				cy += canvas.offsetTop;}
+			return {x: cx, y: cy, width: w, height: h};
+		}
+
+		function getScrollY()
+		{
+			var scrollY = 0;
+			if (typeof(document.body.parentElement) != 'undefined')	{
+				scrollY = document.body.parentElement.scrollTop; }
+			else if (typeof(window.pageYOffset) != 'undefined'){
+				scrollY = window.pageYOffset; }
+			return scrollY;
+		}
+
+		function mouseDownEvent(x, y)
+		{
+				x -= canvasRect.x; //recibo las coordenadas del mouse y obtengo su posicion relativa al area rectangular
+				y -= canvasRect.y - getScrollY();
+				if (puntos.length == 0)
+				{
+					trazos.length = 0;
+					canvas_context.clearRect(0, 0, canvasRect.width, canvasRect.height);
+				}
+				puntos.length = 1; //inicialmente cuando se da clik en el mouse se almacena un solo punto, entonces el tamaño del arreglo de puntos será 1
+				puntos[0] = new Point(x, y); //crea un nuevo punto y cuando se lance el evento mover mouse, se almacena en cada movimiento, ya puntos.length deja de ser cero
+				mostrarMensaje("almacenando trazo #" + (trazos.length + 1) + "...");
+				var colorTrazo = "rgb(" + rand(0,200) + "," + rand(0,200) + "," + rand(0,200) + ")"; // da un color al azar al trazo
+				canvas_context.strokeStyle = colorTrazo;
+				canvas_context.fillStyle = colorTrazo;
+				canvas_context.fillRect(x - 4, y - 3, 5, 5);// x-4, y-3 indica la posición exacta donde se dibujara, un poquito arriba del mouse para que se vea el trazo (5x5 es el tamaño del punto que se va a dibujar)
+				pressed = true;
+		}
+
+		function mouseMoveEvent(x, y)
+		{
+			if (pressed)
+			{
+				x -= canvasRect.x; //recibo las coordenadas del mouse y obtengo su posicion relativa al area rectangular
+				y -= canvasRect.y - getScrollY();
+				puntos[puntos.length] = new Point(x, y); //agrego un nuevo punto a la lista de puntos
+				dibujarTrazo(puntos.length - 2, puntos.length - 1);//va dibujando los puntos
+			}
+		}
+
+		function mouseUpEvent(x, y)
+		{
+				if (pressed)
+				{
+					pressed = false;
+					trazos[trazos.length] = puntos.slice(); // agrega un nuevo trazo a la lista
+					mostrarMensaje("trazo #" + trazos.length + " almacenado.");
+				}
+		}
+
+		function dibujarTrazo(from, to)
+		{
+			canvas_context.beginPath();
+			canvas_context.moveTo(puntos[from].X, puntos[from].Y);
+			canvas_context.lineTo(puntos[to].X, puntos[to].Y);
+			canvas_context.closePath();
+			canvas_context.stroke();
+		}
+
+		function mostrarMensaje(str)
+		{
+			canvas_context.fillStyle = "rgb(68,72,136)";
+			canvas_context.fillRect(0, 0, canvasRect.width, 20);
+			canvas_context.fillStyle = "rgb(255,255,255)";
+			canvas_context.fillText(str, 1, 14);
+		}
+
+		function rand(low, high)
+		{
+			return Math.floor((high - low + 1) * Math.random()) + low;
+		}
+
+		function round(n, d) // round 'n' to 'd' decimals
+		{
+			d = Math.pow(10, d);
+			return Math.round(n * d) / d
+		}
+
+	</script>
+</head>
+
+<body onload="onLoadEvent()">
+<!-- Gesture image and canvas -->
+<table border="0" width="100%" cellspacing="10">
+	<tr>
+		<td valign="top" width="50%">
+			<canvas id="myCanvas" width=1300 height=600 style="background-color:#ECF8FA"
+					onmousedown="mouseDownEvent(event.clientX, event.clientY)"
+					onmousemove="mouseMoveEvent(event.clientX, event.clientY)"
+					onmouseup="mouseUpEvent(event.clientX, event.clientY)"
+					oncontextmenu="return false;">
+				<span style="background-color:#ffff88;">Este navegador no soporta el elemento canvas, intente en otro.</span>
+			</canvas>
+		</td>
+	</tr>
+</table>
+</body>
+</html>
