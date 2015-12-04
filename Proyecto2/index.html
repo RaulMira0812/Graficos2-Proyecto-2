@@ -61,22 +61,27 @@
 				}
 				puntos.length = 1; //inicialmente cuando se da clik en el mouse se almacena un solo punto, entonces el tamaño del arreglo de puntos será 1
 				puntos[0] = new Point(x, y); //crea un nuevo punto y cuando se lance el evento mover mouse, se almacena en cada movimiento, ya puntos.length deja de ser cero
-				mostrarMensaje("almacenando trazo #" + (trazos.length + 1) + "...");
+				
 				var colorTrazo = "rgb(" + rand(0,200) + "," + rand(0,200) + "," + rand(0,200) + ")"; // da un color al azar al trazo
 				canvas_context.strokeStyle = colorTrazo;
 				canvas_context.fillStyle = colorTrazo;
 				canvas_context.fillRect(x - 4, y - 3, 5, 5);// x-4, y-3 indica la posición exacta donde se dibujara, un poquito arriba del mouse para que se vea el trazo (5x5 es el tamaño del punto que se va a dibujar)
 				pressed = true;
+				
+				//console.log(x,y);
+				//console.log(puntos[0]);
 		}
 
 		function mouseMoveEvent(x, y)
 		{
 			if (pressed)
 			{
+		
 				x -= canvasRect.x; //recibo las coordenadas del mouse y obtengo su posicion relativa al area rectangular
 				y -= canvasRect.y - getScrollY();
 				puntos[puntos.length] = new Point(x, y); //agrego un nuevo punto a la lista de puntos
 				dibujarTrazo(puntos.length - 2, puntos.length - 1);//va dibujando los puntos
+			
 			}
 		}
 
@@ -85,11 +90,34 @@
 				if (pressed)
 				{
 					pressed = false;
+					
+					//console.log(x,y);
+					//console.log(puntos[puntos.length-1]);	
+					
 					trazos[trazos.length] = puntos.slice(); // agrega un nuevo trazo a la lista
+					if (isaHead(puntos.slice())){
+					mostrarMensaje("El trazo es una cabeza");	
+					}else{
 					mostrarMensaje("trazo #" + trazos.length + " almacenado.");
+					}
+					//console.log(trazos[trazos.length-1]); //muestra el stroker en consola
 				}
 		}
 
+		function isaHead(trazo){
+			console.log(trazo[0]);
+			console.log(trazo[trazo.length-1]);
+			console.log(trazo[trazo.length-1]);
+			distance = Distance(trazo[0],trazo[trazo.length-1]);
+			fraction = Round(trazo.length/5,0);
+			//console.log(trazo.length);
+			//console.log(fraction);
+			console.log(distance);
+			distanceMin = Distance(trazo[0],trazo[fraction]);
+			console.log(distanceMin);
+			if(distance<distanceMin){return true;}else{return false;}
+		}
+		
 		function dibujarTrazo(from, to)
 		{
 			canvas_context.beginPath();
