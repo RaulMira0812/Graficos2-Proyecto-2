@@ -11,6 +11,7 @@
 		var headDrawn = false;
 		var bodyDrawn = false;
 		var contador=0;
+		var trazoCabeza , trazoTronco;
 		function onLoadEvent()
 		{
 			document.onselectstart = function() { return false; }
@@ -99,28 +100,60 @@
 					
 					trazos[trazos.length] = puntos.slice(); // agrega un nuevo trazo a la lista
 					if (!headDrawn){
-						if(isaHead(puntos.slice())){						
-						mostrarMensaje("El trazo es una cabeza");	
-						headDrawn = true;
-						} else if (isaBody(puntos.slice())){
-						mostrarMensaje("El trazo es un tronco");	
-						bodyDrawn = true;}
-						trazoAnterior=puntos.slice();
-						//if(contador==0){)}
-					}else{
-						if (isaBody(puntos.slice())){
-						mostrarMensaje("El trazo es un tronco");	
-						bodyDrawn = true;
-						//if(contador==0){)}
-						}else{
-						mostrarMensaje("El trazo es un tronco");	
+						if(isaHead(puntos.slice())){	
+							trazoCabeza = puntos.slice();					
+							mostrarMensaje("El trazo es una cabeza");	
+							headDrawn = true;
+						} 
+						else if (isaBody(puntos.slice())){
+							mostrarMensaje("El trazo es un tronco1");
+							trazoTronco = puntos.slice();	
+							bodyDrawn = true;
 						}
 						trazoAnterior=puntos.slice();
+						return 0;
+						//if(contador==0){)}
+					}if (!bodyDrawn){
+						if (isaBody(puntos.slice())){
+							mostrarMensaje("El trazo es un tronco2");	
+							trazoTronco = puntos.slice();
+							bodyDrawn = true;
+						//if(contador==0){)}
+						}
+						else{
+							mostrarMensaje("El trazo es un tronco3");
+							trazoTronco = puntos.slice()
+							bodyDrawn = true;	
+						}
+						trazoAnterior=puntos.slice();
+						return 0;
 						//mostrarMensaje("El trazo es un tronco");
 					
 					//console.log(trazos[trazos.length-1]); //muestra el stroker en consola
 					}
+					if(headDrawn && bodyDrawn){
+						if(isaUpperExtremity(puntos.slice(),trazoTronco,trazoCabeza))
+							mostrarMensaje("Es una extremidad superior");
+						else
+							mostrarMensaje("Es una extremidad inferior");
+					}
 			}
+		}
+
+		function isaUpperExtremity(trazo,trazo_tronco,trazo_cabeza){
+			punto1Tronco = trazo_tronco[0];
+			punto2Tronco = trazo_tronco[trazo_tronco.length-1];
+			puntoCabeza = trazo_cabeza[0];
+
+			distance1 = Distance(punto1Tronco,puntoCabeza);
+			distance2 = Distance(punto2Tronco,puntoCabeza);
+
+			puntoCercanoCabezaTronco = (distance1<distance2)?punto1Tronco:punto2Tronco;
+			puntoLejanoCabezaTronco = (distance1>distance2)?punto1Tronco:punto2Tronco;
+			puntoExtremidad = trazo[0];
+
+			resultado = (Distance(puntoCercanoCabezaTronco,puntoExtremidad)<Distance(puntoLejanoCabezaTronco,puntoExtremidad))?true:false;
+			return resultado;
 		}
 
 		function isaHead(trazo){
@@ -138,7 +171,11 @@
 				//neck=trazoAnterior[0];}
 				fraction = Round(trazoAnterior.length/4,0);
 				distanceMin = Distance(trazo[0],trazoAnterior[fraction]);
-				if(distanceNeckHead<distanceMin){return true;}else{return false;}	
+				if(distanceNeckHead<distanceMin){
+					return true;
+				}else{
+					return false;
+				}	
 				
 			}else{
 				distance = Distance(trazo[0],trazo[trazo.length-1]);
@@ -167,9 +204,7 @@
 				fraction = Round(trazoAnterior.length/5,0);
 				distanceMin = Distance(trazoAnterior[0],trazoAnterior[fraction]);
 				if(distanceNeckHead<distanceMin){return true;}else{return false;}	
-			}else{
-				return true;	
-			}
+			}else{return true;}
 			
 			
 		}
