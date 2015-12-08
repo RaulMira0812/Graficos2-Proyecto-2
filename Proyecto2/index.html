@@ -12,6 +12,12 @@
 		var bodyDrawn = false;
 		var contador=0;
 		var trazoCabeza , trazoTronco;
+		
+		var centroCabeza;
+		var extremidadesSuperiores = new Array();
+		var extremidadesInferiores = new Array();
+		var muestreoCabezaLadoIzquierdo = new Array();
+		var muestreoCabezaLadoDerecho = new Array();
 		function onLoadEvent()
 		{
 			document.onselectstart = function() { return false; }
@@ -102,7 +108,8 @@
 					if (!headDrawn){
 						if(isaHead(puntos.slice())){	
 							trazoCabeza = puntos.slice();					
-							mostrarMensaje("El trazo es una cabeza");	
+							mostrarMensaje("El trazo es una cabeza");
+							//console.info('trazo cabeza', trazoCabeza);
 							headDrawn = true;
 						} 
 						else if (isaBody(puntos.slice())){
@@ -131,16 +138,180 @@
 					
 					//console.log(trazos[trazos.length-1]); //muestra el stroker en consola
 					}
-					if(headDrawn && bodyDrawn){
-						if(isaUpperExtremity(puntos.slice(),trazoTronco,trazoCabeza))
-							mostrarMensaje("Es una extremidad superior");
-						else
-							mostrarMensaje("Es una extremidad inferior");
+					if(headDrawn && bodyDrawn){							
+						if(isaUpperExtremity(puntos.slice(),trazoTronco,trazoCabeza)){
+							//mostrarMensaje("Es una extremidad superior");
+							extremidadesSuperiores[extremidadesSuperiores.length] =  puntos.slice();
+							console.info('extremidadesSuperiores',extremidadesSuperiores);
+														
+							trazoExtremidadSuperior = extremidadesSuperiores[extremidadesSuperiores.length - 1];
+							
+							if(isRightExtremity(trazoExtremidadSuperior)){							
+								mostrarMensaje("Es un brazo derecho");
+							}
+							else{
+								mostrarMensaje("Es un brazo izquierdo");
+							}
+						}
+							
+						else{
+							//mostrarMensaje("Es una extremidad inferior");
+							extremidadesInferiores[extremidadesInferiores.length] =  puntos.slice();
+							console.info('extremidadesInferiores',extremidadesInferiores);
+														
+							trazoExtremidadInferior = extremidadesInferiores[extremidadesInferiores.length - 1];
+							
+							if(isRightExtremity(trazoExtremidadInferior)){							
+								mostrarMensaje("Es un pie derecho");
+							}
+							else{
+								mostrarMensaje("Es un pie izquierdo");
+							}
+						}
 					}
-			}
+				}
 		}
 		function prueba(){}
-
+		
+		function isRightExtremity(trazoExtremidad){
+			var i=0;
+		
+			var cant = parseInt(trazoExtremidad.length/3);
+							
+			var muestreoExtremity = muestreoExtremidad(trazoExtremidad);
+								
+			obtenerMuestreoCabeza(trazoCabeza, trazoTronco);
+															
+			var distanciaDerecha = 0, distanciaIzquierda = 0;
+								
+			var i=0, j=0;
+								
+			//Distancia total del brazo al lado derecho de la cabeza
+			for(i = 0; i < muestreoCabezaLadoDerecho.length; i++){
+				for(j = 0; j < muestreoExtremity.length; j++){
+					distanciaDerecha = distanciaDerecha + Distance(muestreoCabezaLadoDerecho[i],muestreoExtremity[j]);
+				}									
+			}
+								
+			//Distancia total del brazo al lado izquierdo de la cabeza
+			for(i = 0; i < muestreoCabezaLadoIzquierdo.length; i++){
+				for(j = 0; j < muestreoExtremity.length; j++){
+					distanciaIzquierda = distanciaIzquierda + Distance(muestreoCabezaLadoIzquierdo[i], muestreoExtremity[j]);
+				}									
+			}
+								
+			console.info('dist derecha', distanciaDerecha);
+			console.info('dist izquierda', distanciaIzquierda);
+							
+			if(distanciaDerecha < distanciaIzquierda){
+				return true;
+			}
+			else{
+				return false;
+			}
+		}
+		
+		function muestreoExtremidad(trazoExtremidad){
+			var cant = parseInt(trazoExtremidad.length/3);
+								
+			var muestreoExtremidad = new Array();
+								
+			muestreoExtremidad[0] = trazoExtremidad[0];
+			muestreoExtremidad[1] = trazoExtremidad[cant];
+			muestreoExtremidad[2] = trazoExtremidad[cant*2];
+			muestreoExtremidad[3] = trazoExtremidad[trazoExtremidad.length -1];
+			
+			return muestreoExtremidad;
+		}
+		
+		function obtenerMuestreoCabeza(trazoCabeza, trazoTronco){
+			var i;
+			var ptoInicioTronco = trazoTronco[0];
+						
+			var distanciaMinima = 1000;
+						
+			var yMaxCabeza = 1000;
+			var ptoMaxCabeza;
+						
+			console.log(trazoCabeza.length);
+			for (i = 0; i < trazoCabeza.length; i++) {
+				distance = Distance(ptoInicioTronco,trazoCabeza[i]);
+				if(distance<distanciaMinima){
+					distanciaMinima = distance;
+					centroCabeza = trazoCabeza[i];
+				}
+							
+				posYCabeza = trazoCabeza[i].Y;
+				console.info('y: ', posYCabeza);
+							
+				if(posYCabeza<yMaxCabeza){
+					yMaxCabeza = posYCabeza;
+					ptoMaxCabeza = trazoCabeza[i];
+				}
+			};
+						
+			var cantMuestreo = parseInt((centroCabeza.Y - ptoMaxCabeza.Y)/5);
+				
+			console.info('muestreo: ', cantMuestreo);
+					
+			console.info('ptoInicioTronco: ',ptoInicioTronco);
+			console.info('centroCabeza: ', centroCabeza);
+			console.info('yMaxCabeza: ', ptoMaxCabeza);
+						
+			//Muestreo
+			muestreoCabezaLadoDerecho = new Array();
+			muestreoCabezaLadoIzquierdo = new Array();
+			var c1=0, c2=0, c3=0, c4=0, c5=0, c6=0, c7=0, c8=0;
+			for (i = 0; i < trazoCabeza.length; i++) {	
+				posY = trazoCabeza[i].Y
+				
+				if( ( posY >(ptoMaxCabeza.Y + cantMuestreo - 3) ) && ( posY < (ptoMaxCabeza.Y + cantMuestreo + 3)))							
+				{
+					if(trazoCabeza[i].X > centroCabeza.X && c1 == 0){
+						muestreoCabezaLadoDerecho[muestreoCabezaLadoDerecho.length] = trazoCabeza[i];
+						c1 = 1;
+					}
+					if(trazoCabeza[i].X < centroCabeza.X && c2 == 0){
+						muestreoCabezaLadoIzquierdo[muestreoCabezaLadoIzquierdo.length] = trazoCabeza[i];
+						c2 = 1;
+					}
+				}
+				if( ( posY >(ptoMaxCabeza.Y + cantMuestreo*2 - 3) ) && ( posY < (ptoMaxCabeza.Y + cantMuestreo*2 + 3)))							
+				{
+					if(trazoCabeza[i].X > centroCabeza.X && c3 == 0){
+						muestreoCabezaLadoDerecho[muestreoCabezaLadoDerecho.length] = trazoCabeza[i];
+						c3 = 1;
+					}
+					if(trazoCabeza[i].X < centroCabeza.X && c4 == 0){
+						muestreoCabezaLadoIzquierdo[muestreoCabezaLadoIzquierdo.length] = trazoCabeza[i];
+						c4 = 1;
+					}
+				}
+				if( ( posY >(ptoMaxCabeza.Y + cantMuestreo*3 - 3) ) && ( posY < (ptoMaxCabeza.Y + cantMuestreo*3 + 3)))							
+				{
+					if(trazoCabeza[i].X > centroCabeza.X && c5 == 0){
+						muestreoCabezaLadoDerecho[muestreoCabezaLadoDerecho.length] = trazoCabeza[i];
+						c5 = 1;
+					}
+					if(trazoCabeza[i].X < centroCabeza.X && c6 == 0){
+						muestreoCabezaLadoIzquierdo[muestreoCabezaLadoIzquierdo.length] = trazoCabeza[i];
+						c6 = 1;
+					}
+				}
+				if( ( posY >(ptoMaxCabeza.Y + cantMuestreo*4 - 3) ) && ( posY < (ptoMaxCabeza.Y + cantMuestreo*4 + 3)))							
+				{
+					if(trazoCabeza[i].X > centroCabeza.X && c7 == 0){
+						muestreoCabezaLadoDerecho[muestreoCabezaLadoDerecho.length] = trazoCabeza[i];
+						c7 = 1;
+					}
+					if(trazoCabeza[i].X < centroCabeza.X && c8 == 0){
+						muestreoCabezaLadoIzquierdo[muestreoCabezaLadoIzquierdo.length] = trazoCabeza[i];
+						c8 = 1;
+					}
+				}					
+			};
+		}
+		
 		function isaUpperExtremity(trazo,trazo_tronco,trazo_cabeza){
 			punto1Tronco = trazo_tronco[0];
 			punto2Tronco = trazo_tronco[trazo_tronco.length-1];
@@ -235,7 +406,7 @@
 		function round(n, d) // round 'n' to 'd' decimals
 		{
 			d = Math.pow(10, d);
-			return Math.round(n * d) / d
+			return Math.round(n * d) / d;
 		}
 
 	</script>
