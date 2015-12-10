@@ -76,7 +76,7 @@
 				puntos.length = 1; //inicialmente cuando se da clik en el mouse se almacena un solo punto, entonces el tamaño del arreglo de puntos será 1
 				puntos[0] = new Point(x, y); //crea un nuevo punto y cuando se lance el evento mover mouse, se almacena en cada movimiento, ya puntos.length deja de ser cero
 				
-				var colorTrazo = "rgb(" + rand(0,200) + "," + rand(0,200) + "," + rand(0,200) + ")"; // da un color al azar al trazo
+				var colorTrazo = "rgb(" + 0 + "," + 0 + "," + 0 + ")"; // da un color al azar al trazo
 				canvas_context.strokeStyle = colorTrazo;
 				canvas_context.fillStyle = colorTrazo;
 				canvas_context.fillRect(x - 4, y - 3, 5, 5);// x-4, y-3 indica la posición exacta donde se dibujara, un poquito arriba del mouse para que se vea el trazo (5x5 es el tamaño del punto que se va a dibujar)
@@ -94,6 +94,8 @@
 				x -= canvasRect.x; //recibo las coordenadas del mouse y obtengo su posicion relativa al area rectangular
 				y -= canvasRect.y - getScrollY();
 				puntos[puntos.length] = new Point(x, y); //agrego un nuevo punto a la lista de puntos
+				console.info('puntosfrom', puntos.length - 2);	
+				console.info('puntosto', puntos.length - 1);
 				dibujarTrazo(puntos.length - 2, puntos.length - 1);//va dibujando los puntos
 			
 			}
@@ -114,11 +116,8 @@
 							trazoCabeza = puntos.slice();					
 							mostrarMensaje("El trazo es una cabeza");
 							
-							var colorTrazo2= "rgb(" + 200 + "," + 0 + "," + 0 + ")"; // da un color al azar al trazo
-							canvas_context.strokeStyle = colorTrazo2;
-							canvas_context.fillStyle = colorTrazo2;
-							canvas_context.fillRect(x - 4, y - 3, 5, 5);
-
+							var colorCabeza= "rgb(" + 255 + "," + 0 + "," + 0 + ")"; // color rojo para la cabeza
+							repaint(trazoCabeza,colorCabeza);
 							//console.info('trazo cabeza', trazoCabeza);
 							headDrawn = true;
 						} 
@@ -126,6 +125,8 @@
 							mostrarMensaje("El trazo es un tronco1");
 							trazoTronco = puntos.slice();	
 							bodyDrawn = true;
+							var colorTronco= "rgb(" + 0 + "," +0 + "," + 255 + ")"; // color azul para tronco
+							repaint(trazoTronco,colorTronco);
 						}
 						trazoAnterior=puntos.slice();
 						return 0;
@@ -135,12 +136,16 @@
 							mostrarMensaje("El trazo es un tronco2");	
 							trazoTronco = puntos.slice();
 							bodyDrawn = true;
+							var colorTronco= "rgb(" + 0 + "," +0 + "," + 255 + ")"; // color azul para tronco
+							repaint(trazoTronco,colorTronco);
 						//if(contador==0){)}
 						}
 						else{
 							mostrarMensaje("El trazo es un tronco3");
 							trazoTronco = puntos.slice()
 							bodyDrawn = true;	
+							var colorTronco= "rgb(" + 0 + "," +0 + "," + 255 + ")"; // color azul para tronco
+							repaint(trazoTronco,colorTronco);
 						}
 						trazoAnterior=puntos.slice();
 						return 0;
@@ -155,13 +160,20 @@
 							console.info('extremidadesSuperiores',extremidadesSuperiores);						
 							trazoExtremidadSuperior = extremidadesSuperiores[extremidadesSuperiores.length - 1];
 							
+							
 							if(isRightExtremity(trazoExtremidadSuperior)&&!RigthArmDrawn){							
+								var colorBrazoDer= "rgb(" + 255 + "," +117 + "," + 20 + ")"; // color naranja brazo derecho
+								repaint(trazoExtremidadSuperior,colorBrazoDer);			
 								mostrarMensaje("Es un brazo derecho");
 								RigthArmDrawn=true;
+								
 							}
 							else{
+								var colorBrazoIzq= "rgb(" + 0 + "," +255 + "," + 0 + ")"; // color verde brazo izquierdo
+								repaint(trazoExtremidadSuperior,colorBrazoIzq);
 								mostrarMensaje("Es un brazo izquierdo");
 								LeftArmDrawn=true;
+								
 							}
 						}
 							
@@ -172,19 +184,38 @@
 														
 							trazoExtremidadInferior = extremidadesInferiores[extremidadesInferiores.length - 1];
 							
-							if(isRightExtremity(trazoExtremidadInferior)&&!RigthLegDrawn){							
+							if(isRightExtremity(trazoExtremidadInferior)&&!RigthLegDrawn){	
+								var colorPiernaDer= "rgb(" + 108 + "," +70 + "," + 117 + ")"; // color azul para la cabeza
+								repaint(trazoExtremidadInferior,colorPiernaDer);						
 								mostrarMensaje("Es un pie derecho");
 								RigthLegDrawn=true;
+								
 							}
-							else{
+							else{	
+								var colorPiernaIzq= "rgb(" + 118 + "," +60 + "," + 40 + ")"; // color cafe pierna izquierda
+								repaint(trazoExtremidadInferior,colorPiernaIzq);
 								mostrarMensaje("Es un pie izquierdo");
-								LeftLegDrawn=true;
+								LeftLegDrawn=true;	
+								
 							}
 						}
 					}
 				}
 		}
 		function prueba(){}
+
+		function repaint(trazo,colort){
+
+			canvas_context.strokeStyle = colort;
+			canvas_context.fillStyle = colort;			
+			for  (i=0 ;  i<trazo.length-1 ; i++)
+			{
+				console.info('trazo cabeza', trazoCabeza[i]);
+				canvas_context.moveTo(puntos[i].X, puntos[i].Y);
+				canvas_context.lineTo(puntos[i+1].X, puntos[i+1].Y);
+				canvas_context.stroke();
+			}
+		}
 		
 		function isRightExtremity(trazoExtremidad){
 			var i=0;
