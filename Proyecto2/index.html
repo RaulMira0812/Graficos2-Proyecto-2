@@ -7,7 +7,7 @@
 	<script type="text/javascript" src="js/ndollar.js"></script>
 	<script type="text/javascript"> 
 
-		var pressed, puntos, trazos, reconocedor, canvas_context, canvasRect, trazoAnterior; // variables globales
+		var pressed, puntos, trazos, reconocedor,canvas, canvas_context, canvasRect, trazoAnterior; // variables globales
 		var headDrawn = false;
 		var bodyDrawn = false;
 		var LeftArmDrawn = false;
@@ -30,9 +30,9 @@
 			trazos = new Array(); // arreglo de trazos (arreglo de arreglo de puntos)
 			reconocedor = new NDollarRecognizer(0);
 
-			var canvas = document.getElementById('myCanvas');
+			canvas = document.getElementById('myCanvas');
 			canvas_context = canvas.getContext('2d'); //obtengo el context del canvas,necesario para poder dibujar en el (parte azul)
-			canvas_context.lineWidth = 3;
+			canvas_context.lineWidth = 5;
 			canvas_context.font = "16px Gentilis";
 			canvasRect = getCanvasRect(canvas); // area rectangular del canvas (parte celeste, donde van a ir los trazos)
 			canvas_context.fillStyle = "rgb(68,72,136)";
@@ -62,6 +62,17 @@
 			else if (typeof(window.pageYOffset) != 'undefined'){
 				scrollY = window.pageYOffset; }
 			return scrollY;
+		}
+
+		function buttonOnClick(){
+			canvas_context.clearRect(0, 0, canvas.width, canvas.height);
+			console.log("clickeo"); //muestra el stroker en consola
+			headDrawn = false;
+			bodyDrawn = false;
+			LeftArmDrawn = false;
+			RigthArmDrawn = false;
+			LeftLegDrawn = false;
+			RigthLegDrawn = false;
 		}
 
 		function mouseDownEvent(x, y)
@@ -166,13 +177,19 @@
 								repaint(trazoExtremidadSuperior,colorBrazoDer);			
 								mostrarMensaje("Es un brazo derecho");
 								RigthArmDrawn=true;
-								
 							}
 							else{
+								if(!LeftArmDrawn){								
 								var colorBrazoIzq= "rgb(" + 0 + "," +255 + "," + 0 + ")"; // color verde brazo izquierdo
 								repaint(trazoExtremidadSuperior,colorBrazoIzq);
 								mostrarMensaje("Es un brazo izquierdo");
-								LeftArmDrawn=true;
+								LeftArmDrawn=true;}
+								else{
+								var colorBrazoDer= "rgb(" + 255 + "," +117 + "," + 20 + ")"; // color naranja brazo derecho
+								repaint(trazoExtremidadSuperior,colorBrazoDer);			
+								mostrarMensaje("Es un brazo derecho");
+								RigthArmDrawn=true;
+								}
 								
 							}
 						}
@@ -189,14 +206,19 @@
 								repaint(trazoExtremidadInferior,colorPiernaDer);						
 								mostrarMensaje("Es un pie derecho");
 								RigthLegDrawn=true;
-								
 							}
 							else{	
+								if(!LeftLegDrawn){	
 								var colorPiernaIzq= "rgb(" + 118 + "," +60 + "," + 40 + ")"; // color cafe pierna izquierda
 								repaint(trazoExtremidadInferior,colorPiernaIzq);
 								mostrarMensaje("Es un pie izquierdo");
-								LeftLegDrawn=true;	
-								
+								LeftLegDrawn=true;}
+								else{
+								var colorPiernaDer= "rgb(" + 108 + "," +70 + "," + 117 + ")"; // color azul para la cabeza
+								repaint(trazoExtremidadInferior,colorPiernaDer);						
+								mostrarMensaje("Es un pie derecho");
+								RigthLegDrawn=true;
+								}								
 							}
 						}
 					}
@@ -463,17 +485,47 @@
 </head>
 
 <body onload="onLoadEvent()">
+<header>
+	<h1 style="color: blue;">Proyecto#2 Graficos Por Computadora II - ESPOL 2015-II</h1>
+	<h2 style=";margin-left: 120px;">Grupo#6 Raul Mira / Ricardo Maya / Jose Monar </h2>
+</header
 <!-- Gesture image and canvas -->
 <table border="0" width="100%" cellspacing="10">
 	<tr>
 		<td valign="top" width="50%">
-			<canvas id="myCanvas" width=1300 height=600 style="background-color:#ECF8FA"
+			<canvas id="myCanvas" width=800 height=400 style="background-color:#ECF8FA; border:3px solid #000000;"
 					onmousedown="mouseDownEvent(event.clientX, event.clientY)"
 					onmousemove="mouseMoveEvent(event.clientX, event.clientY)"
 					onmouseup="mouseUpEvent(event.clientX, event.clientY)"
 					oncontextmenu="return false;">
 				<span style="background-color:#ffff88;">Este navegador no soporta el elemento canvas, intente en otro.</span>
 			</canvas>
+		</td>
+		<td valign="top" width="100%">
+			<h2>Colores Representativos </h2>
+			<h2 style="color: red;">Cabeza = rojo </h2>
+			<h2 style="color: blue;">Cuerpo = azul </h2>
+			<h2 style="color: green;">Brazo izquierdo = verde</h2>
+			<h2 style="color: orange;">Brazo derecho = naranja </h2>
+			<h2 style="color: brown;">Pierna izquierda = cafe </h2>
+			<h2 style="color: purple;">Pierna derecha = morado </h2>
+				<button style="background-color:#44c767;
+					-moz-border-radius:28px;
+					-webkit-border-radius:28px;
+					border-radius:28px;
+					border:1px solid #18ab29;
+					display:inline-block;
+					cursor:pointer;
+					color:#ffffff;
+					font-family:Arial;
+					font-size:17px;
+					padding:16px 31px;
+					text-decoration:none;
+					text-shadow:0px 1px 0px #2f6627;"  
+					type="button"
+					onclick="buttonOnClick()"
+				>Limpiar</button>
+			
 		</td>
 	</tr>
 </table>
