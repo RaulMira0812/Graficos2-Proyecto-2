@@ -165,7 +165,7 @@
 					//console.log(trazos[trazos.length-1]); //muestra el stroker en consola
 					}
 					if(headDrawn && bodyDrawn){							
-						if(isaUpperExtremity(puntos.slice(),trazoTronco,trazoCabeza)){
+						if(isanUpperExtremity(puntos.slice(),trazoTronco,trazoCabeza)){
 							//mostrarMensaje("Es una extremidad superior");
 							extremidadesSuperiores[extremidadesSuperiores.length] =  puntos.slice();
 							console.info('extremidadesSuperiores',extremidadesSuperiores);						
@@ -384,7 +384,7 @@
 			};
 		}
 		
-		function isaUpperExtremity(trazo,trazo_tronco,trazo_cabeza){
+		function isanUpperExtremity(trazo,trazo_tronco,trazo_cabeza){
 			punto1Tronco = trazo_tronco[0];
 			punto2Tronco = trazo_tronco[trazo_tronco.length-1];
 			puntoCabeza = trazo_cabeza[0];
@@ -441,9 +441,10 @@
 				distance2 = Distance(trazoAnterior[trazoAnterior.length-1],trazo[0]);
 				console.log(distance2);
 				if(distance1<distance2){ //defino cual es el cuello/pivote 
-				distanceNeckHead=distance1;}
+					distanceNeckHead=distance1;}
 				else{
-				distanceNeckHead=distance2;}
+					distanceNeckHead=distance2;
+				}
 				console.log(distanceNeckHead);
 				fraction = Round(trazoAnterior.length/5,0);
 				distanceMin = Distance(trazoAnterior[0],trazoAnterior[fraction]);
