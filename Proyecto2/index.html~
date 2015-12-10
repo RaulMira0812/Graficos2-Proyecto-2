@@ -10,18 +10,14 @@
 		var pressed, puntos, trazos, reconocedor, canvas_context, canvasRect, trazoAnterior; // variables globales
 		var headDrawn = false;
 		var bodyDrawn = false;
-		var LeftArmDrawn = false;
-		var RigthArmDrawn = false;
-		var LeftLegDrawn = false;
-		var RigthLegDrawn = false;
 		var contador=0;
 		var trazoCabeza , trazoTronco;
+		
 		var centroCabeza;
 		var extremidadesSuperiores = new Array();
 		var extremidadesInferiores = new Array();
 		var muestreoCabezaLadoIzquierdo = new Array();
 		var muestreoCabezaLadoDerecho = new Array();
-
 		function onLoadEvent()
 		{
 			document.onselectstart = function() { return false; }
@@ -57,7 +53,7 @@
 		function getScrollY()
 		{
 			var scrollY = 0;
-			if (typeof(document.body.parentElement) != 'undefined'){
+			if (typeof(document.body.parentElement) != 'undefined')	{
 				scrollY = document.body.parentElement.scrollTop; }
 			else if (typeof(window.pageYOffset) != 'undefined'){
 				scrollY = window.pageYOffset; }
@@ -113,12 +109,6 @@
 						if(isaHead(puntos.slice())){	
 							trazoCabeza = puntos.slice();					
 							mostrarMensaje("El trazo es una cabeza");
-							
-							var colorTrazo2= "rgb(" + 200 + "," + 0 + "," + 0 + ")"; // da un color al azar al trazo
-							canvas_context.strokeStyle = colorTrazo2;
-							canvas_context.fillStyle = colorTrazo2;
-							canvas_context.fillRect(x - 4, y - 3, 5, 5);
-
 							//console.info('trazo cabeza', trazoCabeza);
 							headDrawn = true;
 						} 
@@ -152,16 +142,15 @@
 						if(isaUpperExtremity(puntos.slice(),trazoTronco,trazoCabeza)){
 							//mostrarMensaje("Es una extremidad superior");
 							extremidadesSuperiores[extremidadesSuperiores.length] =  puntos.slice();
-							console.info('extremidadesSuperiores',extremidadesSuperiores);						
+							console.info('extremidadesSuperiores',extremidadesSuperiores);
+														
 							trazoExtremidadSuperior = extremidadesSuperiores[extremidadesSuperiores.length - 1];
 							
-							if(isRightExtremity(trazoExtremidadSuperior)&&!RigthArmDrawn){							
+							if(isRightExtremity(trazoExtremidadSuperior)){							
 								mostrarMensaje("Es un brazo derecho");
-								RigthArmDrawn=true;
 							}
 							else{
 								mostrarMensaje("Es un brazo izquierdo");
-								LeftArmDrawn=true;
 							}
 						}
 							
@@ -172,13 +161,11 @@
 														
 							trazoExtremidadInferior = extremidadesInferiores[extremidadesInferiores.length - 1];
 							
-							if(isRightExtremity(trazoExtremidadInferior)&&!RigthLegDrawn){							
+							if(isRightExtremity(trazoExtremidadInferior)){							
 								mostrarMensaje("Es un pie derecho");
-								RigthLegDrawn=true;
 							}
 							else{
 								mostrarMensaje("Es un pie izquierdo");
-								LeftLegDrawn=true;
 							}
 						}
 					}
@@ -192,8 +179,7 @@
 			var cant = parseInt(trazoExtremidad.length/3);
 							
 			var muestreoExtremity = muestreoExtremidad(trazoExtremidad);
-						
-		
+								
 			obtenerMuestreoCabeza(trazoCabeza, trazoTronco);
 															
 			var distanciaDerecha = 0, distanciaIzquierda = 0;
@@ -234,12 +220,7 @@
 			muestreoExtremidad[1] = trazoExtremidad[cant];
 			muestreoExtremidad[2] = trazoExtremidad[cant*2];
 			muestreoExtremidad[3] = trazoExtremidad[trazoExtremidad.length -1];
-
-			console.info('muestreoExtremity1', muestreoExtremidad[0]);
-			console.info('muestreoExtremity2', muestreoExtremidad[1]);
-			console.info('muestreoExtremity3', muestreoExtremidad[2]);
-			console.info('muestreoExtremity4', muestreoExtremidad[3]);
-
+			
 			return muestreoExtremidad;
 		}
 		
